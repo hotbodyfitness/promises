@@ -10,6 +10,7 @@
 
 var Promise = require('bluebird');
 var fs = require('fs');
+var writeFileAsync = Promise.promisify(fs.writeFile);
 var getGitHubProfileAsync = require('./promisification.js');
 var db = Promise.promisifyAll(require('./callbackReview'));
 
@@ -18,9 +19,8 @@ var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
     .then((user) => {
       return getGitHubProfileAsync.getGitHubProfileAsync(user);
     })
-    .then((res) => {
-      var writeFileAsync = Promise.promisify(fs.writeFile);
-      return writeFileAsync(writeFilePath, res);
+    .then((response) => {
+      return writeFileAsync(writeFilePath, JSON.stringify(response));
     })
     .catch((err) => {
       console.log('fetchProfileAndWriteToFile error: ', err);
